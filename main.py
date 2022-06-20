@@ -1,4 +1,5 @@
 # Importing necessary modules
+import os
 import uvicorn
 from fastapi import FastAPI
 
@@ -17,7 +18,8 @@ def main():
 def predict(data : RequestBody):
     n_output_days = 7
     data = data.input_data
-    model = load_model(r'D:\HPE_CTY\api\MLP')
+    path = os.path.join(os.getcwd(), "MLP")
+    model = load_model(path)
     for i in range(n_output_days):
         output = model.predict([data[i:]]).item(0)
         data.append(output)
