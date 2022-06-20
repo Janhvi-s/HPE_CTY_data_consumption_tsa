@@ -2,12 +2,22 @@
 import os
 import uvicorn
 from fastapi import FastAPI
-
+from fastapi.middleware.cors import CORSMiddleware
 from models import RequestBody
 from utils import load_model
 
 # Declaring our FastAPI instance
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Defining path operation for root endpoint
 @app.get('/')
