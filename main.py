@@ -1,7 +1,7 @@
 # Importing necessary modules
 import os
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from models import RequestBody
 from utils import load_model
@@ -21,16 +21,25 @@ app.add_middleware(
 
 # Defining path operation for root endpoint
 @app.get('/')
-def main():
+async def main():
 	return {'message': 'Server Health: OK'}
 
 @app.post('/predict')
-def predict(data : RequestBody):
+async def predict(data : RequestBody, model: str = "MLP"):
     n_output_days = 7
     data = data.input_data
-    path = os.path.join(os.getcwd(), "MLP")
+    
+    if model == "MLP":
+        path = os.path.join(os.getcwd(), "MLP")
+    elif model == "LSTM":
+        path = os.path.join(os.getcwd(), "LSTM")
+    else:
+        return {'error': 'Invalid model type'}
+
     model = load_model(path)
+
     for i in range(n_output_days):
         output = model.predict([data[i:]]).item(0)
         data.append(output)
+
     return {'output': data}
