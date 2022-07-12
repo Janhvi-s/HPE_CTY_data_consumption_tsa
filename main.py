@@ -55,7 +55,7 @@ def predict_from_file(file: UploadFile, model: str = "ARIMA"):
         arima_model = train_arima(file.file)
         data = generate_arima_prediction(arima_model)
     elif model == "PROPHET":
-        data = []
+        data = [1, 2, 3, 4, 5, 6, 7]
     else:
         raise HTTPException(status_code=400, detail="Invalid model type")
 
