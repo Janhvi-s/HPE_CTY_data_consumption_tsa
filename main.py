@@ -3,6 +3,8 @@ import os
 import uvicorn
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+
+# Importing util function
 from models import RequestBody
 from utils import load_model, train_arima, generate_arima_prediction, check_csv
 
@@ -24,6 +26,7 @@ app.add_middleware(
 async def main():
 	return {'message': 'Server Health: OK'}
 
+# Endpoint for pretrained models
 @app.post('/predict')
 async def predict(data : RequestBody, model: str = "MLP"):
     n_output_days = 7
@@ -45,6 +48,7 @@ async def predict(data : RequestBody, model: str = "MLP"):
     return {'output': data}
 
 
+# Endpoint for train-and-predict models
 @app.post('/predict/upload')
 def predict_from_file(file: UploadFile, model: str = "ARIMA"):
     if not check_csv(file.filename):
@@ -55,6 +59,7 @@ def predict_from_file(file: UploadFile, model: str = "ARIMA"):
         arima_model = train_arima(file.file)
         data = generate_arima_prediction(arima_model)
     elif model == "PROPHET":
+        # Hardcoded output value. Model not implemented yet
         data = [1, 2, 3, 4, 5, 6, 7]
     else:
         raise HTTPException(status_code=400, detail="Invalid model type")
