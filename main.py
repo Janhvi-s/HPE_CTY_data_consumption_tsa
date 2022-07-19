@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Importing util function
 from models import RequestBody
-from utils import load_model, train_arima, generate_arima_prediction, check_csv
+from utils import get_user_type, load_model, train_arima, generate_arima_prediction, check_csv
 
 # Declaring our FastAPI instance
 app = FastAPI()
@@ -41,11 +41,17 @@ async def predict(data : RequestBody, model: str = "MLP"):
 
     model = load_model(path)
 
-    for i in range(n_output_days):
-        output = model.predict([data[i:]]).item(0)
-        data.append(output)
-
-    return {'output': data}
+    result = []
+    for user_data in data:
+        for i in range(n_output_days):
+            output = model.predict([user_data[i:]]).item(0)
+            user_data.append(output)
+        user_result = dict()
+        user_result["forecast"] = user_data
+        user_result["user_type"] = get_user_type(user_data)
+        result.append(user_result)
+        
+    return {'output': result}
 
 
 # Endpoint for train-and-predict models

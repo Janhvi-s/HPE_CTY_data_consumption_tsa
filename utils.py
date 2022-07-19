@@ -1,4 +1,6 @@
+from audioop import avg
 import pandas as pd
+import numpy as np
 from tensorflow import keras
 from pmdarima.arima import auto_arima
 from pathlib import Path
@@ -47,3 +49,18 @@ def generate_arima_prediction(arima_model):
     """
     predictions = arima_model.predict(n_periods=7).tolist()
     return predictions
+
+def get_user_type(data_list):
+    FREE_USER = 0  # 0 to 15
+    SMALL_USER = 1  # 16 to 50
+    MID_TIER_USER = 2  # 51 to 100
+    ENTERPRISE_USER = 3  # 100 and above
+    avg_consumption = np.average(data_list)
+    if avg_consumption >= 100:
+        return ENTERPRISE_USER
+    elif avg_consumption >= 51 and avg_consumption < 100:
+        return MID_TIER_USER
+    elif avg_consumption >= 16 and avg_consumption < 50:
+        return SMALL_USER
+    else:
+        return FREE_USER
