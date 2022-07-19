@@ -1,5 +1,6 @@
 # Importing necessary modules
 import os
+from h11 import Data
 import uvicorn
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,16 +42,13 @@ async def predict(data : RequestBody, model: str = "MLP"):
 
     model = load_model(path)
 
-    result = []
-    for user_data in data:
-        for i in range(n_output_days):
-            output = model.predict([user_data[i:]]).item(0)
-            user_data.append(output)
-        user_result = dict()
-        user_result["forecast"] = user_data
-        user_result["user_type"] = get_user_type(user_data)
-        result.append(user_result)
-        
+    for i in range(n_output_days):
+        output = model.predict([data[i:]]).item(0)
+        data.append(output)
+    result = dict()
+    result["forecast"] = data
+    result["user_type"] = get_user_type(data)
+    
     return {'output': result}
 
 
